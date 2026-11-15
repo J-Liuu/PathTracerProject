@@ -2,7 +2,7 @@
 
 THIS IS AN AI-GENERATED README OF CURENT STATE OF PROJECT!
 
-AI-Generated codes are labeld by comment.
+AI-Generated codes are labeled by comment.
 
 ALL CMAKE FILES ARE AI-Generated.
 
