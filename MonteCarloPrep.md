@@ -109,7 +109,7 @@ Based on the current repo and Michael's README that he setup
 ## 5. How this connects to ReSTIR
 So the first comparison we'd want to make is **regular direct-light sampling vs. ReSTIR direct-light sampling**, with the same scene and roughly the same budgets.
 
->The Cornell box is a good starting point for checking that the lighting math works. However, since it only has one area light, we'll probably need a scene with more lights to really show where ReSTIR helps. That's our proposed test plan, motivated by the many-light examples in the ReSTIR sources (Anagnostou, 2023; Bitterli et al., 2020; michaelk0217, n.d.).
+>The Cornell box is a good starting point for checking that the lighting math works. However, since it only has one area light, we'll probably need a scene with more lights to really show where ReSTIR helps. That's our proposed test plan, motivated by the many-light examples in the ReSTIR sources (Anagnostou, 2023; Bitterli et al., 2020).
 
 ## 6. References
 
