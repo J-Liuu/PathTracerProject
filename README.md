@@ -7,6 +7,7 @@ AI-Generated codes are labeled by comment.
 ALL CMAKE FILES ARE AI-Generated.
 
 Some vulkan codes are re-used from past projects as of now to save time (such as vk::Context, vk::Swapchain, vk::Resources).
+Some Design/Architecture choices (Bindless descriptor architecture and Scene<===>GpuScene mirroring/syncing) were made by AI.
 
 
 A real-time **Vulkan hardware ray tracer** written in C++20 and **Slang**. The end goal is a renderer that runs either **Monte Carlo path tracing** or **ReSTIR**, each with an optional **spectral** mode. This README describes the codebase **as it is today**: the ray tracing foundation those techniques will be built on.

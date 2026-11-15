@@ -10,6 +10,7 @@ namespace pt
 namespace
 {
 
+// ai generated function
 template <class T>
 vk::Buffer makeUploadBuffer(const vk::Context& ctx, const std::vector<T>& data, VkBufferUsageFlags usage,
     const char* name)
