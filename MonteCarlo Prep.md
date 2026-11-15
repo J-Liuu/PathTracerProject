@@ -56,6 +56,7 @@ $$
 = \frac{2}{0.25}
 = 8
 $$
+
 >We divide by the PDF to account for how the sample was selected.
 >
 >If some light samples are selected more frequently than others, dividing by their PDF prevents those regions from incorrectly contributing too much brightness.
