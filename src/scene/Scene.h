@@ -1,0 +1,75 @@
+#pragma once
+
+#include <string>
+#include <vector>
+
+#include <core/Types.h>
+#include <scene/Camera.h>
+
+namespace pt
+{
+// cpu side of truth - GpuScene.h mirrors this on gpu
+struct Vertex
+{
+	vec3 position;
+	vec3 normal;
+	vec2 uv;
+};
+
+struct Mesh {
+	std::string name;
+	std::vector<Vertex> vertices;
+	std::vector<u32> indices;
+	u32 materialIndex = 0;
+};
+
+struct Material
+{
+	std::string name;
+	vec3 baseColor{ 0.8f };
+	float roughness = 1.0f;
+	vec3 emission { 0.0f };
+	float metallic = 0.0f;
+	float ior = 1.5f;
+	float transmission = 0.0f;
+	i32 baseColorTexture = -1; // index into Scene::texturePaths, -1 = none
+};
+
+struct Instance
+{
+	u32 meshIndex = 0;
+	mat4 transform{ 1.0f };
+};
+
+enum DirtyFlags : u32
+{
+	DirtyNone = 0,
+	DirtyGeometry = 1u << 0, // meshes changed -> rebuild BLAS + vertex/index buffs
+	DirtyInstances = 1u << 1, // transforms changed -> refit/rebuild TLAS
+	DirtyMaterials = 1u << 2, //material params changed, reupload material buffer
+	DirtyAll = 0xFFFFFFFFu,
+};
+
+class Scene
+{
+public:
+	std::vector<Mesh> meshes;
+	std::vector<Material> materials;
+	std::vector<Instance> instances;
+	std::vector<std::string> texturePaths;
+	Camera camera;
+
+	void markDirty(u32 flags) { m_dirty |= flags; }
+	u32 dirtyFlags() const { return m_dirty; }
+	void clearDirty() { m_dirty = DirtyNone; }
+
+	u32 addMaterial(Material m);
+	u32 addMesh(Mesh m); // returns mesh idx
+	void addInstance(u32 meshIndex, const mat4& transform = mat4(1.0f));
+
+
+private:
+	u32 m_dirty = DirtyAll;
+};
+
+}

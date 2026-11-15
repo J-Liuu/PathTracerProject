@@ -1,0 +1,8 @@
+build/
+out/
+.vs/
+.vscode/
+*.user
+*.spv
+CMakeUserPresets.json
+imgui.ini

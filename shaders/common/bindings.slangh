@@ -1,0 +1,73 @@
+// resources shared by every shader.
+// must match vk::BindlessDescriptors and gpu::PushConstants
+
+#pragma once
+
+#include "shared/GpuStructs.h"
+
+[[vk::binding(0, 0)]] Sampler2D gTextures[];
+[[vk::binding(1, 0)]] RWTexture2D<float4> gImages[];
+[[vk::binding(2, 0)]] RaytracingAccelerationStructure gTlas;
+
+[[vk::push_constant]] ConstantBuffer<PushConstants> pc;
+
+// surface data at a ray hit in world space.
+struct SurfaceHit
+{
+    float3 position;
+    float3 normal; // interpolated shading normal, faces the incoming ray
+    float3 geometricNormal; // true triangle normal, faces the incoming ray
+    float2 uv;
+    uint materialIndex;
+};
+
+// eads the hit triangle through buffer device addresses (pc.meshes -> vertices/indices),
+// interpolates with barycentrics
+// trasforms to world space
+// instanceId = InstanceID() (= TLAS customIndex = GpuMeshInfo index), primitive = PrimitiveIndex(). // ai
+SurfaceHit fetchSurface(uint instanceId, uint primitive, float2 bary, float3x4 objectToWorld,
+                        float3 rayOrigin, float3 rayDir, float hitT)
+{
+    GpuMeshInfo mesh = pc.meshes[instanceId];
+    uint i0 = mesh.indices[primitive * 3 + 0];
+    uint i1 = mesh.indices[primitive * 3 + 1];
+    uint i2 = mesh.indices[primitive * 3 + 2];
+    GpuVertex v0 = mesh.vertices[i0];
+    GpuVertex v1 = mesh.vertices[i1];
+    GpuVertex v2 = mesh.vertices[i2];
+    float3 w = float3(1.0 - bary.x - bary.y, bary.x, bary.y); // barycentric weights for v0, v1, v2
+
+    SurfaceHit s;
+    s.position = rayOrigin + rayDir * hitT;
+    float3 n = v0.normal * w.x + v1.normal * w.y + v2.normal * w.z;
+    float3 ng = cross(v1.position - v0.position, v2.position - v0.position);
+    // float3x4 * float4(dir, 0) -> rotates/scales a direction (fine for rigid + uniform scale)
+    s.normal = normalize(mul(objectToWorld, float4(n, 0.0)));
+    s.geometricNormal = normalize(mul(objectToWorld, float4(ng, 0.0)));
+    if (dot(s.geometricNormal, rayDir) > 0.0) { // hit the back side: flip so normals face the viewer
+        s.geometricNormal = -s.geometricNormal;
+        s.normal = -s.normal;
+    }
+    s.uv = v0.uv * w.x + v1.uv * w.y + v2.uv * w.z;
+    s.materialIndex = mesh.materialIndex;
+    return s;
+}
+
+RayDesc makeRay(float3 o, float3 d, float tmin, float tmax)
+{
+    RayDesc r;
+    r.Origin = o;
+    r.Direction = d;
+    r.TMin = tmin;
+    r.TMax = tmax;
+    return r;
+}
+
+RayDesc primaryRay(FrameUniforms frame, uint2 pixel, uint2 dims, float2 jitter)
+{
+    float2 ndc = (float2(pixel) + jitter) / float2(dims) * 2.0 - 1.0;
+    float4 target = mul(frame.projInverse, float4(ndc, 1.0, 1.0));
+    float3 dir = normalize(mul(frame.viewInverse, float4(normalize(target.xyz / target.w), 0.0)).xyz);
+
+    return makeRay(frame.cameraPosition, dir, 0.0, 1e30);
+}
