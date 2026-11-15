@@ -1,5 +1,14 @@
 # PathTracer: CSCI 580 Final Project
- 
+
+THIS IS AN AI-GENERATED README OF CURENT STATE OF PROJECT!
+
+AI-Generated codes are labeld by comment.
+
+ALL CMAKE FILES ARE AI-Generated.
+
+Some vulkan codes are re-used from past projects as of now to save time (such as vk::Context, vk::Swapchain, vk::Resources).
+
+
 A real-time **Vulkan hardware ray tracer** written in C++20 and **Slang**. The end goal is a renderer that runs either **Monte Carlo path tracing** or **ReSTIR**, each with an optional **spectral** mode. This README describes the codebase **as it is today**: the ray tracing foundation those techniques will be built on.
  
 > **Current state:** a Cornell box is uploaded to the GPU, acceleration structures (BLAS/TLAS) are built, and a ray tracing pipeline shoots **one primary ray per pixel** and shows the **surface normal** (or albedo) of what it hits. The result is tonemapped and presented. The camera can fly around. Bounces, lighting and the actual rendering techniques are the next steps (see [Extending the renderer](#12-extending-the-renderer)).
